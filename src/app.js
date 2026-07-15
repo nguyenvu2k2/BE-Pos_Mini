@@ -65,11 +65,13 @@ const isLocalDevelopmentOrigin = (origin) => {
   }
 };
 
+const allowAllOrigins = corsOrigins.includes('*');
+
 const corsOptions = {
   origin: (origin, callback) => {
     if (
       !origin ||
-      corsOrigins.includes('*') ||
+      allowAllOrigins ||
       corsOrigins.includes(origin) ||
       isLocalDevelopmentOrigin(origin)
     ) {
@@ -82,7 +84,16 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+  ],
+  exposedHeaders: ['Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 };
 
 app.use(
