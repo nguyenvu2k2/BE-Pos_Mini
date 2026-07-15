@@ -64,31 +64,34 @@ const isLocalDevelopmentOrigin = (origin) => {
   }
 };
 
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (
+      !origin ||
+      corsOrigins.includes('*') ||
+      corsOrigins.includes(origin) ||
+      isLocalDevelopmentOrigin(origin)
+    ) {
+      return callback(null, true);
+    }
+
+    const error = new Error('Not allowed by CORS');
+    error.statusCode = 403;
+    return callback(error);
+  },
+  credentials: true,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
 app.use(
   helmet({
     contentSecurityPolicy: false,
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   }),
 );
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (
-        !origin ||
-        corsOrigins.includes('*') ||
-        corsOrigins.includes(origin) ||
-        isLocalDevelopmentOrigin(origin)
-      ) {
-        return callback(null, true);
-      }
-
-      const error = new Error('Not allowed by CORS');
-      error.statusCode = 403;
-      return callback(error);
-    },
-    credentials: true,
-  }),
-);
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
