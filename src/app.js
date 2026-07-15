@@ -103,7 +103,6 @@ app.use(
   }),
 );
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
