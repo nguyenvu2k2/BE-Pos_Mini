@@ -31,6 +31,7 @@ const defaultCorsOrigins = [
   'https://frontend-pos.up.railway.app',
   'https://pos-mini.up.railway.app',
   'https://pos-mini-cafe.up.railway.app',
+  'https://fe-pos-mini.vercel.app',
 ];
 
 const parseCorsOrigins = () => {
