@@ -32,6 +32,7 @@ const defaultCorsOrigins = [
   'https://pos-mini.up.railway.app',
   'https://pos-mini-cafe.up.railway.app',
   'https://fe-pos-mini.vercel.app',
+  'https://fe-pos-mini-jf3qqmdhf-nguyenvu2k2s-projects.vercel.app',
   '*.vercel.app',
   '*.onrender.com',
 ];
