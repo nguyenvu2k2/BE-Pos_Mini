@@ -32,6 +32,8 @@ const defaultCorsOrigins = [
   'https://pos-mini.up.railway.app',
   'https://pos-mini-cafe.up.railway.app',
   'https://fe-pos-mini.vercel.app',
+  '*.vercel.app',
+  '*.onrender.com',
 ];
 
 const normalizeOrigin = (origin) =>
@@ -51,6 +53,7 @@ const parseCorsOrigins = () => {
 };
 
 const corsOrigins = parseCorsOrigins();
+const allowAllOrigins = process.env.CORS_ALLOW_ALL === 'true';
 
 const isLocalDevelopmentOrigin = (origin) => {
   if (process.env.NODE_ENV === 'production') {
@@ -70,7 +73,11 @@ const isLocalDevelopmentOrigin = (origin) => {
 
 const originIsAllowed = (origin) => {
   if (!origin) {
-    return false;
+    return true;
+  }
+
+  if (allowAllOrigins) {
+    return true;
   }
 
   const normalizedOrigin = normalizeOrigin(origin);
