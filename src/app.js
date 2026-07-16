@@ -34,16 +34,19 @@ const defaultCorsOrigins = [
   'https://fe-pos-mini.vercel.app',
 ];
 
+const normalizeOrigin = (origin) =>
+  origin.trim().replace(/\/$/, '').toLowerCase();
+
 const parseCorsOrigins = () => {
   const configuredOrigins = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN;
 
   if (!configuredOrigins) {
-    return defaultCorsOrigins;
+    return defaultCorsOrigins.map(normalizeOrigin);
   }
 
   return configuredOrigins
     .split(',')
-    .map((origin) => origin.trim())
+    .map((origin) => normalizeOrigin(origin))
     .filter(Boolean);
 };
 
@@ -65,14 +68,38 @@ const isLocalDevelopmentOrigin = (origin) => {
   }
 };
 
-const allowAllOrigins = corsOrigins.includes('*');
+const originIsAllowed = (origin) => {
+  if (!origin) {
+    return false;
+  }
+
+  const normalizedOrigin = normalizeOrigin(origin);
+
+  if (corsOrigins.includes('*') || corsOrigins.includes(normalizedOrigin)) {
+    return true;
+  }
+
+  try {
+    const parsedOrigin = new URL(normalizedOrigin);
+    if (corsOrigins.includes(parsedOrigin.origin)) {
+      return true;
+    }
+
+    const hostname = parsedOrigin.hostname;
+    return corsOrigins.some(
+      (allowed) =>
+        allowed.startsWith('*.') && hostname.endsWith(allowed.slice(2)),
+    );
+  } catch {
+    return false;
+  }
+};
 
 const corsOptions = {
   origin: (origin, callback) => {
     if (
       !origin ||
-      allowAllOrigins ||
-      corsOrigins.includes(origin) ||
+      originIsAllowed(origin) ||
       isLocalDevelopmentOrigin(origin)
     ) {
       return callback(null, true);
