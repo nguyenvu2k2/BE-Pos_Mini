@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: pos-mini-api
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    buildCommand: npm ci --omit=dev
+    startCommand: npm run pos:start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: RENDER
+        value: true
