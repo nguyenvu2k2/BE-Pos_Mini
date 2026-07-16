@@ -54,7 +54,10 @@ const parseCorsOrigins = () => {
 };
 
 const corsOrigins = parseCorsOrigins();
-const allowAllOrigins = process.env.CORS_ALLOW_ALL === 'true';
+const allowAllOrigins =
+  process.env.CORS_ALLOW_ALL === 'true' ||
+  process.env.NODE_ENV === 'production' ||
+  process.env.RENDER === 'true';
 
 const isLocalDevelopmentOrigin = (origin) => {
   if (process.env.NODE_ENV === 'production') {
@@ -131,6 +134,22 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header(
+      'Access-Control-Allow-Methods',
+      'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    );
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Content-Type,Authorization,X-Requested-With,Accept,Origin',
+    );
+    res.header('Access-Control-Allow-Credentials', 'true');
+    return res.sendStatus(204);
+  }
+  next();
+});
 app.use(
   helmet({
     contentSecurityPolicy: false,
